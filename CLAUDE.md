@@ -47,6 +47,7 @@ This distinguishes AI-generated code from human-written code and prevents confli
 | LWC Component  | cs + PascalCase             | csAccountHierarchy         |
 | Flow           | CS_ + PascalCase            | CS_AccountValidation       |
 | Test Class     | CS + ClassName + Test       | CSAccountServiceTest       |
+| Permission Set | CS_ + PascalCase            | CS_ServiceAgentPermissions |
 
 ---
 
@@ -67,6 +68,9 @@ This distinguishes AI-generated code from human-written code and prevents confli
 | /sf-flow | /sf-flow designs/<file>.md CS_FlowName | force-app/.../flows/ |
 | /sf-org-inspect | /sf-org-inspect | cache/org-context.json |
 | /sf-refresh-cache | /sf-refresh-cache | cache/org-context.json (overwrite) |
+| /sf-object | /sf-object designs/<file>.md CS_ObjectName__c | force-app/.../objects/ |
+| /sf-permission-set | /sf-permission-set designs/<file>.md CS_PermSetName | force-app/.../permissionsets/ |
+| /sf-admin-setup | /sf-admin-setup designs/<file>.md | designs/setup-instructions/ |
 
 ---
 
@@ -77,3 +81,6 @@ This distinguishes AI-generated code from human-written code and prevents confli
 - Apex triggers → force-app/main/default/triggers/
 - LWC components → force-app/main/default/lwc/
 - Flows → force-app/main/default/flows/
+- Object metadata → force-app/main/default/objects/
+- Permission sets → force-app/main/default/permissionsets/
+- Admin setup instructions → designs/setup-instructions/
