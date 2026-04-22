@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(sf org:*)",
+      "Bash(sf apex:*)",
+      "Bash(sf data:*)",
+      "Bash(sf project:*)",
+      "Bash(sf sobject:*)",
+      "Bash(git add*)",
+      "Bash(git commit*)",
+      "Bash(git status*)"
+    ]
+  },
+  "env": {
+    "MAX_THINKING_TOKENS": "10000",
+    "SF_ORG_CACHE_PATH": "cache/org-context.json"
+  }
+}
