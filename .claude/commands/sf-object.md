@@ -13,7 +13,7 @@ Use the dev-agent to generate the object metadata:
 
 1. Read the design file at the path provided
 2. Read `cache/org-context.json` to verify no naming conflict with existing custom objects
-3. If the object name does not start with CS_, stop and output: "⚠️ Object name must start with CS_ prefix and end with __c. Example: CS_ServiceRequest__c"
+3. If the object name does not start with CS_ or does not end with __c, stop and output: "⚠️ Object name must start with CS_ prefix and end with __c. Example: CS_ServiceRequest__c"
 4. If any field in the design does not start with CS_, output a warning listing the non-compliant fields and skip those fields — do not generate field files for them
 5. Generate `CS_ObjectName__c.object-meta.xml` following the Custom Object & Field Standards in dev-agent
 6. Generate one `CS_FieldName__c.field-meta.xml` per field defined in the design, using the correct field type template from dev-agent
