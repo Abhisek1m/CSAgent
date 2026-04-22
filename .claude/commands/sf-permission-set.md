@@ -18,7 +18,7 @@ Use the dev-agent to generate the permission set metadata:
    - Field-level security (Read, Edit by default) for all CS_ fields in the design
    - Apex class access for any CS classes referenced in the design
    - Dev-agent comments on each block indicating where to restrict permissions
-4. If the design references multiple distinct roles or personas, generate one permission set per role AND a `CS_[Feature]Permissions.permissionsetgroup-meta.xml` bundling them
+4. If the design describes different permission requirements for different user types or personas (e.g., Service Agent vs. Service Manager), generate one permission set per user type AND a `CS_[Feature]Permissions.permissionsetgroup-meta.xml` bundling them — this is about functional personas in the design, not Salesforce Role Hierarchy objects
 5. If the design specifies a sharing strategy, generate `CS_ObjectName__c.sharingRules-meta.xml` using the appropriate template (criteria-based or owner-based) from dev-agent
 6. If no sharing strategy is mentioned in the design, output: "⚠️ OWD not specified in design — defaulting to Private. Update OWD manually: Setup → Sharing Settings → [CS_ObjectName__c]."
 7. Save to the correct directories per dev-agent output paths
