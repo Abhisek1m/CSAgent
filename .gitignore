@@ -1,0 +1,18 @@
+# Salesforce DX
+.sfdx/
+.localdevserver/
+.sf/
+
+# Node
+node_modules/
+
+# VS Code (keep workspace settings, ignore local overrides)
+.vscode/settings.json
+.vscode/*.code-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+*.log
