@@ -703,3 +703,297 @@ When the design references multiple roles, generate one permission set per role 
 - Permission set: `force-app/main/default/permissionsets/[CS_PermSetName].permissionset-meta.xml`
 - Permission set group: `force-app/main/default/permissionsetgroups/[CS_GroupName].permissionsetgroup-meta.xml`
 - Sharing rules: `force-app/main/default/sharingRules/[CS_ObjectName__c].sharingRules-meta.xml`
+
+## Admin Setup Instructions Standards
+
+When `/sf-admin-setup` is invoked, scan the design file for mentions of the activities below. For each activity found, generate a structured instruction block. Save the complete output to `designs/setup-instructions/YYYY-MM-DD-<feature-name>-setup.md`.
+
+If no covered activities are found, output:
+> "No complex admin activities found in this design. Use /sf-object for metadata and /sf-permission-set for permissions."
+
+### Instruction Block Format
+
+Each activity section uses this structure:
+
+```
+## [Activity Type]: [Name]
+
+**Setup Path:** Setup → [exact navigation path]
+
+### Steps
+1. [Exact UI action with field names and values]
+2. [Next step]
+
+### Key Values from Design
+| Field | Value |
+|---|---|
+| [field name] | [value from design] |
+
+### Notes
+[Warnings, gotchas, post-setup verification steps]
+```
+
+### Template: Approval Process
+
+```
+## Approval Process: [CS_ProcessName]
+
+**Setup Path:** Setup → Process Automation → Approval Processes → New Approval Process
+
+### Steps
+1. Object: [Object API Name from design]
+2. Process Name: [CS_ProcessName], Unique Name: [CS_ProcessName]
+3. Entry Criteria: [entry criteria formula or field criteria from design]
+4. Approval Steps: for each step — Step Name, Criteria (if any), Assigned Approver (User/Role/Queue), Approval/Rejection Actions
+5. Initial Submission Actions: Lock the record (recommended) + any email alerts from design
+6. Final Approval Actions: Field update (e.g., Status = Approved) + email alert
+7. Final Rejection Actions: Field update (e.g., Status = Rejected) + email alert
+8. Recall Actions: Unlock record + field update (e.g., Status = Draft)
+9. Activate the process
+
+### Notes
+- Set "Record Editability" to "Administrator ONLY" to lock records during approval
+- Test in sandbox: submit a test record and walk through approval and rejection paths
+- Submitter must have "Submit for Approval" permission
+```
+
+### Template: Page Layout
+
+```
+## Page Layout: [Object] — [Layout Name]
+
+**Setup Path:** Setup → Object Manager → [Object API Name] → Page Layouts → [Layout Name] → Edit
+
+### Steps
+1. Drag the following fields into the Information section (in order): [list fields from design]
+2. Add the following Related Lists: [CS_ObjectName__c — from design]
+3. Set these fields as required on the layout: [list from design]
+4. Save the layout
+5. Assign to profiles: Page Layouts → Page Layout Assignment → Edit Assignment → set [profile name] to this layout
+
+### Key Values from Design
+| Section | Fields |
+|---|---|
+| Information | [field1, field2, field3] |
+| [Other Section] | [field4, field5] |
+
+### Notes
+- Page layouts for existing standard objects (Case, Account, etc.) must be edited manually — metadata deploy does not reliably update layouts on standard objects in all orgs
+```
+
+### Template: Custom Report Type
+
+```
+## Custom Report Type: [Name]
+
+**Setup Path:** Setup → Report Types → New Custom Report Type
+
+### Steps
+1. Primary Object: [Object API Name from design]
+2. Report Type Label: [Label], Object Name: [API Name], Description: [from design]
+3. Deployment Status: Deployed
+4. Click Next
+5. If related object: click "Click to relate another object" → select [Related Object] → set relationship to "Each [Primary] record must have at least one related [Secondary] record" or "..may or may not have..."
+6. Click Save
+7. Edit the layout: drag all CS_ fields into the displayed columns section
+
+### Notes
+- Users need "Create and Customize Reports" to use this report type
+- Test by creating a sample report with this type after saving
+```
+
+### Template: Email Alert
+
+```
+## Email Alert: [CS_AlertName]
+
+**Setup Path:** Setup → Process Automation → Email Alerts → New Email Alert
+
+### Steps
+1. Description: [CS_AlertName], Unique Name: [CS_AlertName]
+2. Object: [Object API Name]
+3. Email Template: [select template — create the template first if it does not exist]
+4. Recipients: add [recipient type: Role / Queue / Email Field / User / Owner]
+5. From Email Address: [org-wide default or specific address from design]
+6. Save
+
+### Notes
+- Create the Email Template before creating the Email Alert (Setup → Classic Email Templates or Lightning Email Templates)
+- Test by triggering the automation that fires this alert in a sandbox
+```
+
+### Template: Custom Tab
+
+```
+## Custom Tab: [Object Name]
+
+**Setup Path:** Setup → Tabs → New (under Custom Object Tabs)
+
+### Steps
+1. Object: [CS_ObjectName__c]
+2. Tab Style: [choose an icon that matches the object's purpose]
+3. Visibility: Default On
+4. Add to Custom Apps: check [App Name from design]
+5. Save
+
+### Notes
+- Tab appears in the App Launcher after creation
+- Control per-profile tab visibility via Profile → Object Settings if needed
+```
+
+### Template: Custom App
+
+```
+## Custom App: [App Name]
+
+**Setup Path:** Setup → App Manager → New Lightning App
+
+### Steps
+1. App Name: [CS_AppName], Developer Name: [CS_AppName], Description: [from design]
+2. App Branding: upload logo if applicable (250×250 px PNG)
+3. Navigation Items: add tabs in this order: [list from design]
+4. Utility Items: [add if design specifies, e.g., Open CTI, Recent Items]
+5. Navigation and Personalization: enable "Enable App Personalization" if users should customize nav
+6. Assign to User Profiles: [profiles from design]
+7. Save & Finish
+
+### Notes
+- Test the app by switching to it from the App Launcher
+- Only profiles explicitly assigned will see this app
+```
+
+### Template: Assignment Rule
+
+```
+## Assignment Rule: [Object] Assignments
+
+**Setup Path:** Setup → [Case/Lead] Assignment Rules → New (or open existing active rule)
+
+### Steps
+1. Rule Name: [CS_RuleName]
+2. Set as Active: ✅ (deactivates the currently active rule — confirm this is correct)
+3. Add Rule Entries in this order:
+   - Entry 1: Order 1, Criteria: [field] [operator] [value] → Assign to [User/Queue name]
+   - Entry 2: Order 2, [next criteria] → Assign to [User/Queue]
+   - Final Entry: no criteria (catch-all) → Assign to [default queue/user]
+4. Save
+
+### Notes
+- Rule entries are evaluated top-to-bottom — order matters, put most-specific criteria first
+- Only one assignment rule can be active at a time per object
+- Test by creating a record that matches each entry's criteria
+```
+
+### Template: Escalation Rule
+
+```
+## Escalation Rule: [Object] Escalations
+
+**Setup Path:** Setup → Escalation Rules → New
+
+### Steps
+1. Rule Name: [CS_RuleName]
+2. Set as Active: ✅
+3. Add Rule Entries:
+   - Entry Criteria: [field] [operator] [value] (e.g., Priority equals High)
+   - Business Hours: [select Business Hours record or "24 hours"]
+   - Escalation Time: [N hours] after [Case Creation / Last Modification / Last Customer Activity]
+   - Escalation Action: Reassign to [User/Queue] + Notify [recipients]
+4. Save
+
+### Notes
+- Escalation rules fire on Cases by default; custom object escalation requires additional configuration
+- Business Hours affect time calculations if configured — verify with your org's business hours settings
+- Test by creating a case matching the criteria and waiting for the escalation window (or use a short time in sandbox)
+```
+
+### Template: Custom Label
+
+```
+## Custom Label: [CS_LabelName]
+
+**Setup Path:** Setup → Custom Labels → New Custom Label
+
+### Steps
+1. Short Description: [CS_LabelName]
+2. Name: [CS_LabelName]
+3. Language: English
+4. Categories: [category from design or leave blank]
+5. Value: [default value from design]
+6. Save
+7. If org uses multiple languages: click New Local Translations/Overrides to add translations
+
+### Notes
+- Reference in Apex: System.Label.CS_LabelName
+- Reference in Formula fields and Validation Rules: $Label.CS_LabelName
+- Reference in LWC: import CS_LABEL from '@salesforce/label/c.CS_LabelName'
+```
+
+### Template: Custom Setting
+
+```
+## Custom Setting: [CS_SettingName]
+
+**Setup Path:** Setup → Custom Settings → New
+
+### Steps
+1. Label: [CS_SettingName], Object Name: [CS_SettingName]
+2. Setting Type: Hierarchy (recommended — allows per-profile and per-user override) or List
+3. Visibility: Public (accessible from Apex and Formulas without additional permissions)
+4. Description: [from design]
+5. Save
+6. Add Fields: click New for each field defined in the design
+7. Set default values: click Manage → New → set Profile to blank for org default → fill field values → Save
+
+### Notes
+- Hierarchy settings precedence: User > Profile > Org Default
+- Reference in Apex: CS_SettingName__c setting = CS_SettingName__c.getOrgDefaults();
+- Reference in Formula: $Setup.CS_SettingName__c.CS_FieldName__c
+```
+
+### Template: Custom Metadata Type
+
+```
+## Custom Metadata Type: [CS_TypeName]
+
+**Setup Path:** Setup → Custom Metadata Types → New
+
+### Steps
+1. Label: [CS_TypeName], Plural Label: [plural], Object Name: [CS_TypeName]
+2. Description: [from design]
+3. Save
+4. Add Fields: click New Field for each field in the design
+5. Add Records: click Manage Records → New for each record defined in the design
+
+### Notes
+- Custom Metadata Type records are deployable via metadata (unlike Custom Settings data)
+- Use /sf-object to generate the XML for the type structure and deploy via sf project deploy
+- Reference in Apex: List<CS_TypeName__mdt> records = CS_TypeName__mdt.getAll().values();
+- Individual record: CS_TypeName__mdt rec = CS_TypeName__mdt.getInstance('RecordName');
+```
+
+### Template: Email Template
+
+```
+## Email Template: [CS_TemplateName]
+
+**Setup Path:** Setup → Classic Email Templates → New Template (or Lightning Experience → Email Templates)
+
+### Steps
+1. Folder: [select or create folder e.g. "CS Templates"]
+2. Available for Use: ✅
+3. Email Template Name: [CS_TemplateName], Template Unique Name: [CS_TemplateName]
+4. Encoding: Unicode (UTF-8)
+5. Description: [from design]
+6. Subject: [subject from design — include merge fields e.g. "Case {!Case.CaseNumber} — Your feedback is needed"]
+7. Body: [structured content from design — include merge fields where appropriate]
+8. Save
+
+### Notes
+- Merge fields must reference fields the running user has Read access to
+- Test by clicking "Send Test and Verify Merge Fields" on the template detail page
+- HTML templates require a letterhead — use "Custom (without Letterhead)" for simple HTML
+```
+
+## Output File Paths — Setup Instructions
+- Setup instructions: `designs/setup-instructions/YYYY-MM-DD-<feature-name>-setup.md`
