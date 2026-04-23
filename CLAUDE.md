@@ -83,4 +83,7 @@ This distinguishes AI-generated code from human-written code and prevents confli
 - Flows → force-app/main/default/flows/
 - Object metadata → force-app/main/default/objects/
 - Permission sets → force-app/main/default/permissionsets/
-- Admin setup instructions → designs/setup-instructions/
+- Page layouts → force-app/main/default/layouts/
+- Report types → force-app/main/default/reportTypes/
+- Email templates → force-app/main/default/email/CS_EmailTemplates/
+- Admin setup instructions (manual-only) → designs/setup-instructions/

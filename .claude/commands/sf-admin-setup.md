@@ -1,45 +1,58 @@
-Generate step-by-step Salesforce Setup UI instructions for complex admin activities found in a solution design.
+Generate metadata and/or Setup UI instructions for admin activities found in a solution design.
 
 **Input:** $ARGUMENTS — design file path only
 Example: designs/2026-04-22-satisfaction-score.md
 
 ## Instructions
 
-Use the dev-agent to scan the design and generate setup instructions:
+Use the dev-agent to scan the design and generate output:
 
 1. Read the design file at the path provided
-2. Scan the design for any mention of these activities: Approval Process, Page Layout, Custom Report Type, Email Alert, Custom Tab, Custom App, Assignment Rule, Escalation Rule, Custom Label, Custom Setting, Custom Metadata Type, Email Template
-3. For each activity found, generate a structured instruction block using the Admin Setup Instructions Standards templates in dev-agent
-4. Order the instruction blocks by implementation sequence — objects and fields first, then automation, then UI, then reporting
-5. If no covered activities are found in the design, output: "No complex admin activities found in this design. Use /sf-object for metadata and /sf-permission-set for permissions."
-6. Save the complete output to `designs/setup-instructions/YYYY-MM-DD-<feature-name>-setup.md` using today's date and deriving the feature name from the design file name by stripping the date prefix and `.md` extension (e.g., `designs/2026-04-22-customer-satisfaction-score.md` → feature name is `customer-satisfaction-score`)
+2. Scan for any mention of these activities and classify each as DEPLOYABLE or MANUAL:
 
-After saving, output exactly this block (replacing [filename] and [N] with actuals):
+   **DEPLOYABLE via SFDX — generate metadata XML:**
+   - Page Layout → `Layout` metadata, `force-app/main/default/layouts/`
+   - Custom Report Type → `ReportType` metadata, `force-app/main/default/reportTypes/`
+   - Email Template → `EmailTemplate` metadata, `force-app/main/default/email/CS_EmailTemplates/`
+
+   **MANUAL — Setup UI only (cannot be deployed via sf project deploy):**
+   - Escalation Rule (not a deployable metadata type)
+   - Approval Process (keep manual — too complex and risky to auto-deploy)
+   - Assignment Rule (not a deployable metadata type)
+   - Email Alert (keep manual — requires workflow context)
+   - Custom Tab (keep manual — App Builder is simpler)
+   - Custom App (keep manual — App Builder is simpler)
+   - Custom Label (keep manual — simple enough in Setup)
+   - Custom Setting (keep manual — data values not deployable)
+   - Custom Metadata Type records (type is deployable, records are data)
+   - Reports / Dashboards (not deployable via sf project deploy)
+   - Business Hours (not a deployable metadata type)
+   - OWD / Sharing Settings (keep manual — triggers org-wide sharing recalculation; risky to deploy)
+
+3. For DEPLOYABLE activities: generate the metadata XML file using templates from the Deployable UI Metadata Standards section in dev-agent. Save to the correct `force-app/` path.
+
+4. For MANUAL activities: generate a structured step-by-step instruction block using the Admin Setup Instructions Standards templates in dev-agent.
+
+5. Order output by implementation sequence: objects/fields → layouts/templates → automation → reporting
+
+6. If no covered activities are found, output: "No complex admin activities found in this design. Use /sf-object for metadata and /sf-permission-set for permissions."
+
+7. Save the complete setup instructions (manual steps only) to `designs/setup-instructions/YYYY-MM-DD-<feature-name>-setup.md` using today's date, deriving the feature name from the design file name by stripping the date prefix and `.md` extension.
+
+After completing, output exactly this block (replacing placeholders with actuals):
 
 ---
-## Manual Setup Instructions saved
+## Admin setup complete
 
+### Metadata generated (deploy with SFDX)
+[list each generated file with its deploy command, or "None" if all activities were manual]
+
+### Manual Setup UI steps
 `designs/setup-instructions/[filename]`
 
-These [N] admin activities **cannot be deployed via metadata** and must be completed manually in Setup:
+These [N] activities **cannot be deployed** and must be completed manually:
+[numbered list of manual activity types found]
 
-[numbered list of the activity types found, e.g.:]
-1. Page Layout — add related list to Case layout
-2. Custom Report Type — Cases with Satisfaction Scores
-
-**When to complete these steps:**
-- Page Layouts and Tabs: after object metadata is deployed, before user testing
-- Report Types and Dashboards: after all data is in place
-- OWD / Sharing Settings: before assigning the permission set to users
-
-**Deployment reminder** — if you haven't deployed the metadata yet:
-```bash
-# Object first
-sf project deploy start --source-dir force-app/main/default/objects/[CS_ObjectName__c] --target-org <alias>
-# Then permission set
-sf project deploy start --source-dir force-app/main/default/permissionsets --target-org <alias>
-# Then flow
-sf project deploy start --source-dir force-app/main/default/flows --target-org <alias>
-```
+**Why OWD stays manual:** OWD changes trigger an org-wide sharing recalculation that can affect all records. Set it manually in Setup → Sharing Settings → [CS_ObjectName__c] to control timing.
 
 ---
