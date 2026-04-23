@@ -13,5 +13,13 @@ The story-agent will:
 4. Include acceptance criteria, priority, story points, and metadata impact
 5. Save the output to `stories/YYYY-MM-DD-<kebab-name>.md` using today's date
 
-After the file is saved, output:
-"Story file saved to stories/[filename]. Review it, then run: /sf-design stories/[filename]"
+After the file is saved, output exactly this block (replacing [filename] with the actual file name):
+
+---
+## Story saved: stories/[filename]
+
+Review the stories file, then kick off the design:
+
+**Next step →** `/sf-design stories/[filename]`
+
+---

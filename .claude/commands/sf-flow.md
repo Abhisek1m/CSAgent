@@ -22,9 +22,37 @@ Use the dev-agent to generate the Flow:
    - Status: Active
 5. Save to `force-app/main/default/flows/[CS_FlowName].flow-meta.xml`
 
-After saving, output:
-"Generated:
-- force-app/main/default/flows/[CS_FlowName].flow-meta.xml
+After saving, output exactly this block (replacing placeholders with actuals):
 
-Note: Review the Flow XML in VS Code Salesforce extension before deploying. 
-Complex Flow logic may require adjustments in the visual Flow Builder."
+---
+## Generated: Flow metadata
+
+- `force-app/main/default/flows/[CS_FlowName].flow-meta.xml`
+
+> Review the Flow XML in VS Code before deploying. Complex logic may need adjustments in the visual Flow Builder (Setup → Flows → [Flow name]).
+
+---
+## Full deployment order
+
+Deploy in this sequence — each component depends on the previous:
+
+```bash
+# 1. Object and fields (always first)
+sf project deploy start --source-dir force-app/main/default/objects/[CS_ObjectName__c] --target-org <alias>
+
+# 2. Permission set
+sf project deploy start --source-dir force-app/main/default/permissionsets --target-org <alias>
+
+# 3. Flow (depends on object existing in org)
+sf project deploy start --source-dir force-app/main/default/flows --target-org <alias>
+```
+
+---
+## After deployment — manual steps
+
+Complete the manual Setup UI steps documented in:
+`designs/setup-instructions/[date]-[feature-name]-setup.md`
+
+These cover activities that cannot be deployed via metadata (page layouts, report types, OWD sharing settings, etc.).
+
+---

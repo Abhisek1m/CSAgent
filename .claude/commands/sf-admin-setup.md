@@ -14,7 +14,32 @@ Use the dev-agent to scan the design and generate setup instructions:
 5. If no covered activities are found in the design, output: "No complex admin activities found in this design. Use /sf-object for metadata and /sf-permission-set for permissions."
 6. Save the complete output to `designs/setup-instructions/YYYY-MM-DD-<feature-name>-setup.md` using today's date and deriving the feature name from the design file name by stripping the date prefix and `.md` extension (e.g., `designs/2026-04-22-customer-satisfaction-score.md` → feature name is `customer-satisfaction-score`)
 
-After saving, output:
-"Setup instructions saved to designs/setup-instructions/[filename].
+After saving, output exactly this block (replacing [filename] and [N] with actuals):
 
-Complete these manual Setup steps before or alongside deploying the metadata files from /sf-object and /sf-permission-set."
+---
+## Manual Setup Instructions saved
+
+`designs/setup-instructions/[filename]`
+
+These [N] admin activities **cannot be deployed via metadata** and must be completed manually in Setup:
+
+[numbered list of the activity types found, e.g.:]
+1. Page Layout — add related list to Case layout
+2. Custom Report Type — Cases with Satisfaction Scores
+
+**When to complete these steps:**
+- Page Layouts and Tabs: after object metadata is deployed, before user testing
+- Report Types and Dashboards: after all data is in place
+- OWD / Sharing Settings: before assigning the permission set to users
+
+**Deployment reminder** — if you haven't deployed the metadata yet:
+```bash
+# Object first
+sf project deploy start --source-dir force-app/main/default/objects/[CS_ObjectName__c] --target-org <alias>
+# Then permission set
+sf project deploy start --source-dir force-app/main/default/permissionsets --target-org <alias>
+# Then flow
+sf project deploy start --source-dir force-app/main/default/flows --target-org <alias>
+```
+
+---

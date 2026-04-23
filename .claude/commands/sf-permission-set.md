@@ -15,7 +15,8 @@ Use the dev-agent to generate the permission set metadata:
 2. If the permission set name does not start with CS_, stop and output: "⚠️ Permission set name must start with CS_ prefix. Example: CS_ServiceAgentPermissions"
 3. Generate `CS_PermSetName.permissionset-meta.xml` with:
    - Object permissions (Read, Create, Edit by default) for all CS_ objects in the design
-   - Field-level security (Read, Edit by default) for all CS_ fields in the design
+   - Field-level security (Read, Edit by default) for all CS_ fields in the design that are NOT required=true
+   - NEVER add fieldPermissions blocks for required fields — Salesforce blocks deployment with "You cannot deploy to a required field"
    - Apex class access for any CS classes referenced in the design
    - Dev-agent comments on each block indicating where to restrict permissions
 4. If the design describes different permission requirements for different user types or personas (e.g., Service Agent vs. Service Manager), generate one permission set per user type AND a `CS_[Feature]Permissions.permissionsetgroup-meta.xml` bundling them — this is about functional personas in the design, not Salesforce Role Hierarchy objects
@@ -23,9 +24,21 @@ Use the dev-agent to generate the permission set metadata:
 6. If no sharing strategy is mentioned in the design, output: "⚠️ OWD not specified in design — defaulting to Private. Update OWD manually: Setup → Sharing Settings → [CS_ObjectName__c]."
 7. Save to the correct directories per dev-agent output paths
 
-After saving, output:
-"Generated:
-- force-app/main/default/permissionsets/[CS_PermSetName].permissionset-meta.xml
+After saving, output exactly this block (replacing placeholders with actuals):
+
+---
+## Generated: Permission set metadata
+
+- `force-app/main/default/permissionsets/[CS_PermSetName].permissionset-meta.xml`
 [list group file and sharing rule file if generated]
 
-Deploy with: sf project deploy start --source-dir force-app/main/default/permissionsets"
+**Deploy after the object is deployed:**
+```bash
+sf project deploy start --source-dir force-app/main/default/permissionsets --target-org <alias>
+```
+
+**Next steps →**
+- Generate automation: `/sf-flow designs/[filename] CS_FlowName`
+- Generate manual Setup instructions: `/sf-admin-setup designs/[filename]`
+
+---

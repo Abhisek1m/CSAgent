@@ -23,10 +23,20 @@ Use the dev-agent to generate the object metadata:
 10. Generate `CS_ListViewName.listView-meta.xml` for each list view in the design (skip if none)
 11. Create subdirectories as needed and save all files under `force-app/main/default/objects/CS_ObjectName__c/`
 
-After saving, output:
-"Generated:
-- force-app/main/default/objects/[CS_ObjectName__c]/[CS_ObjectName__c].object-meta.xml
-- force-app/main/default/objects/[CS_ObjectName__c]/fields/ ([N] field files)
+After saving, output exactly this block (replacing placeholders with actuals):
+
+---
+## Generated: Object metadata
+
+- `force-app/main/default/objects/[CS_ObjectName__c]/[CS_ObjectName__c].object-meta.xml`
+- `force-app/main/default/objects/[CS_ObjectName__c]/fields/` ([N] field files)
 [list validation rules, record types, compact layouts, list views if generated]
 
-Deploy with: sf project deploy start --source-dir force-app/main/default/objects/[CS_ObjectName__c]"
+**Deploy this object first** (permission set and flow depend on it):
+```bash
+sf project deploy start --source-dir force-app/main/default/objects/[CS_ObjectName__c] --target-org <alias>
+```
+
+**Next step →** `/sf-permission-set designs/[filename] CS_PermSetName`
+
+---

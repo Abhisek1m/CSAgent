@@ -19,8 +19,34 @@ The design-agent will:
 5. Include a **Why Code?** justification for any Apex or LWC that is recommended
 6. Save to `designs/YYYY-MM-DD-<feature-name>.md` using today's date
 
-After the file is saved, output:
-"Design saved to designs/[filename]. Review it, then run one of:
-- /sf-apex designs/[filename] CSClassName
-- /sf-lwc designs/[filename] csComponentName
-- /sf-flow designs/[filename] CS_FlowName"
+After the file is saved, output exactly this block (replacing [filename] and component names with actuals from the design):
+
+---
+## Design saved: designs/[filename]
+
+Review the design file, then generate metadata in this order:
+
+### Step 1 — Object & Fields
+```
+/sf-object designs/[filename] CS_ObjectName__c
+```
+Run once per custom object in the design.
+
+### Step 2 — Permissions
+```
+/sf-permission-set designs/[filename] CS_PermSetName
+```
+
+### Step 3 — Automation
+```
+/sf-flow designs/[filename] CS_FlowName
+```
+Use `/sf-apex designs/[filename] CSClassName` or `/sf-lwc designs/[filename] csComponentName` if the design requires Apex or LWC.
+
+### Step 4 — Manual Admin Setup
+```
+/sf-admin-setup designs/[filename]
+```
+Generates step-by-step Setup UI instructions for page layouts, report types, and other admin-only activities.
+
+---
